@@ -1070,6 +1070,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * will be passed to callback methods if set.
 	 * @throws MqttException if there was an error registering the subscription.
 	 */
+	@Override
 	public IMqttToken subscribe(String topicFilter, int qos, Object userContext, IMqttActionListener callback, IMqttMessageListener messageListener) throws MqttException {
 
 		return subscribe(new String[] {topicFilter}, new int[] {qos}, userContext, callback, new IMqttMessageListener[] {messageListener});
@@ -1090,6 +1091,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * will be passed to callback methods if set.
 	 * @throws MqttException if there was an error registering the subscription.
 	 */
+	@Override
 	public IMqttToken subscribe(String topicFilter, int qos, IMqttMessageListener messageListener) throws MqttException {
 		
 		return subscribe(topicFilter, qos, null, null, messageListener);
@@ -1114,6 +1116,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * will be passed to callback methods if set.
 	 * @throws MqttException if there was an error registering the subscription.
 	 */
+	@Override
 	public IMqttToken subscribe(String[] topicFilters, int[] qos, IMqttMessageListener[] messageListeners) throws MqttException {
 		
 		return subscribe(topicFilters, qos, null, null, messageListeners);
@@ -1142,6 +1145,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * will be passed to callback methods if set.
 	 * @throws MqttException if there was an error registering the subscription.
 	 */
+	@Override
 	public IMqttToken subscribe(String[] topicFilters, int[] qos, Object userContext, IMqttActionListener callback, IMqttMessageListener[] messageListeners) throws MqttException {
 		IMqttToken token = new MqttTokenAndroid(this, userContext, callback, topicFilters);
 		String activityToken = storeToken(token);
@@ -1261,6 +1265,11 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 		String activityToken = storeToken(token);
 		mqttService.unsubscribe(clientHandle, topic, null, activityToken);
 		return token;
+	}
+
+	@Override
+	public boolean removeMessage(IMqttDeliveryToken token) throws MqttException {
+		return false;
 	}
 
 	/**
@@ -1419,18 +1428,24 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 		return false;
 
 	}
-	
+
+	@Override
 	public void messageArrivedComplete(int messageId, int qos) throws MqttException {
 		throw new UnsupportedOperationException();	
 	}
-	
+
+	@Override
 	public void setManualAcks(boolean manualAcks) {
 		throw new UnsupportedOperationException();	
 	}
 
+	@Override
+	public void reconnect() throws MqttException {
+	}
+
 	/**
 	 * Process the results of a connection
-	 * 
+	 *
 	 * @param data
 	 */
 	private void connectAction(Bundle data) {
@@ -1444,7 +1459,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 
 	/**
 	 * Process a notification that we have disconnected
-	 * 
+	 *
 	 * @param data
 	 */
 	private void disconnected(Bundle data) {
@@ -1460,7 +1475,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 
 	/**
 	 * Process a Connection Lost notification
-	 * 
+	 *
 	 * @param data
 	 */
 	private void connectionLostAction(Bundle data) {
@@ -1508,7 +1523,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 
 	/**
 	 * Process notification of a publish(send) operation
-	 * 
+	 *
 	 * @param data
 	 */
 	private void sendAction(Bundle data) {
@@ -1519,7 +1534,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 
 	/**
 	 * Process notification of a subscribe operation
-	 * 
+	 *
 	 * @param data
 	 */
 	private void subscribeAction(Bundle data) {
@@ -1529,7 +1544,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 
 	/**
 	 * Process notification of an unsubscribe operation
-	 * 
+	 *
 	 * @param data
 	 */
 	private void unSubscribeAction(Bundle data) {
@@ -1539,7 +1554,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 
 	/**
 	 * Process notification of a published message having been delivered
-	 * 
+	 *
 	 * @param data
 	 */
 	private void messageDeliveredAction(Bundle data) {
@@ -1557,7 +1572,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 
 	/**
 	 * Process notification of a message's arrival
-	 * 
+	 *
 	 * @param data
 	 */
 	private void messageArrivedAction(Bundle data) {
@@ -1589,7 +1604,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	
 	/**
 	 * Process trace action - pass trace data back to the callback
-	 * 
+	 *
 	 * @param data
 	 */
 	private void traceAction(Bundle data) {
@@ -1655,22 +1670,31 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 * Sets the DisconnectedBufferOptions for this client
 	 * @param bufferOpts the DisconnectedBufferOptions
 	 */
+	@Override
 	public void setBufferOpts(DisconnectedBufferOptions bufferOpts) {
 		mqttService.setBufferOpts(clientHandle, bufferOpts);
 	}
 
+	@Override
 	public int getBufferedMessageCount(){
 		return mqttService.getBufferedMessageCount(clientHandle);
 	}
 
+	@Override
 	public MqttMessage getBufferedMessage(int bufferIndex){
 		return mqttService.getBufferedMessage(clientHandle, bufferIndex);
 	}
 
+	@Override
 	public void deleteBufferedMessage(int bufferIndex){
 		mqttService.deleteBufferedMessage(clientHandle, bufferIndex);
 	}
-	
+
+	@Override
+	public int getInFlightMessageCount() {
+		return 0;
+	}
+
 	/**
 	 * Get the SSLSocketFactory using SSL key store and password
 	 * <p>
