@@ -32,9 +32,8 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', excludes: ["org.eclipse.paho.client.mqttv3-${rootProject.ext.clientVersion}.jar"], include: '*.jar')
     testImplementation 'junit:junit:4.13.2'
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    implementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
-    implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${rootProject.ext.clientVersion}"
     implementation (project(':org.eclipse.paho.android.service')){
         //exclude module: "org.eclipse.paho.client.mqttv3"

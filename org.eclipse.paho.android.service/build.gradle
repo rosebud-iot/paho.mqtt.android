@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${rootProject.ext.clientVersion}"
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.supportLibVersion}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
 
