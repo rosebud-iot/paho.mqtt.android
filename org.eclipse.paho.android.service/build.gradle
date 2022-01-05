@@ -25,12 +25,14 @@ android {
 
 repositories {
     google()
+    mavenCentral()
     maven { url rootProject.ext.mavenUrl }
 }
 
 dependencies {
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${rootProject.ext.clientVersion}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
 
@@ -124,6 +126,7 @@ publishing {
     }
 }
 
+/*
 // Required to bundle Java library Jar in AAR
 clean.doLast{
     copyLibs.execute()
@@ -135,3 +138,4 @@ assemble.doLast {
 clean.doFirst {
     delete 'libs'
 }
+ */
