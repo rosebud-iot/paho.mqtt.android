@@ -30,15 +30,13 @@ repositories {
 
 
 dependencies {
-    implementation fileTree(dir: 'libs', excludes: ["org.eclipse.paho.client.mqttv3-${rootProject.ext.clientVersion}.jar"], include: '*.jar')
-    testImplementation 'junit:junit:4.13.2'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${rootProject.ext.clientVersion}"
-    implementation (project(':org.eclipse.paho.android.service')){
-        //exclude module: "org.eclipse.paho.client.mqttv3"
-        transitive=true
-    }
+    implementation project(':org.eclipse.paho.android.service')
+    testImplementation 'junit:junit:4.13.2'
 }
 
 configurations.implementation.exclude module: 'org.eclipse.paho.client.mqttv3'
