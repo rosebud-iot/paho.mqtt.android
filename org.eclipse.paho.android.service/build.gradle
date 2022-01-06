@@ -9,6 +9,8 @@ android {
         minSdkVersion 9
         targetSdkVersion 30
 
+        setProperty("archivesBaseName", "org.eclipse.paho.android.service")
+
         testApplicationId "org.eclipse.paho.android.service.test"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,58 +38,17 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:truth:1.4.0'
 }
 
-/*
-android.libraryVariants.all { variant ->
-    task("generate${variant.name}Javadoc", type: Javadoc) {
-        title = "$name $version API"
-        description "Generates Javadoc for $variant.name."
-        source = variant.javaCompile.source
-        ext.androidJar =
-                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-        options.links("http://docs.oracle.com/javase/7/docs/api/");
-        options.links("http://d.android.com/reference/");
-        exclude '** /BuildConfig.java'
-        exclude '** /R.java'
-    }
-}
-*/
+def sweeprProperties = new Properties()
+def sweeprPropertiesFile = rootProject.file("sweepr.properties")
 
-/*
-// Generate Sources Jar
-task("generateSourcesJar", type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+if (sweeprPropertiesFile.exists()) {
+    sweeprProperties.load(new FileInputStream(sweeprPropertiesFile))
+} else {
+    sweeprProperties.setProperty('github.username', System.getenv("GPR_USER") ?: "undefined-user")
+    sweeprProperties.setProperty('github.token', System.getenv("GPR_API_KEY") ?: "undefined-token")
 }
 
-// Copy the Paho Java client into the libs directory to bundle it with the AAR
-task("copyLibs", type: Copy) {
-    println "Copying MQTT Jar into libs directory"
-    from configurations.implementation
-    into 'libs'
-    include 'org.eclipse.paho*'
-}
-
-// Renames the Release AAR file to a maven convention
-task("renameReleaseAAR", type: Copy) {
-    from("$buildDir/outputs/aar")
-    into("$buildDir/outputs/aar/")
-    include('org.eclipse.paho.android.service-debug.aar')
-    rename('org.eclipse.paho.android.service-debug.aar', rootProject.ext.serviceArchivesBaseName + '-' + rootProject.ext.serviceVersion + '.aar')
-}
-
-// Generate Plain Jar Version of library (good for legacy users)
-task("generateLibraryJar", type: Jar) {
-    from("$buildDir/intermediates/classes/release")
-}
-
-// Generate Javadoc
-task("generateJavaDocJar", type: Jar,
-        dependsOn: (rootProject.ext.serviceVersion.endsWith('-SNAPSHOT') ? 'generatedebugJavadoc' : 'generatereleaseJavadoc')){
-    from("$buildDir/docs/javadoc")
-    classifier = 'javadoc'
-}
-*/
+project.ext.sweeprProperties = sweeprProperties
 
 // Ensure that the publish task depends on assembly
 tasks.all { task ->
@@ -98,44 +59,53 @@ tasks.all { task ->
 
 publishing {
     publications {
-        paho(MavenPublication) {
-            groupId 'org.eclipse.paho'
-            //artifact generateSourcesJar
-            //artifact generateLibraryJar
-            //artifact generateJavaDocJar
-            artifact "$buildDir/outputs/aar/" + rootProject.ext.serviceArchivesBaseName + "-" + rootProject.ext.serviceVersion + ".aar"
+        release(MavenPublication) {
+            groupId rootProject.ext.group
+            artifactId 'org.eclipse.paho.android.service'
+            version rootProject.ext.serviceVersion
+
+            artifact("$buildDir/outputs/aar/org.eclipse.paho.android.service-release.aar")
+            //artifact "$buildDir/outputs/aar/" + rootProject.ext.serviceArchivesBaseName + "-" + rootProject.ext.serviceVersion + ".aar"
+
+            pom {
+                name = 'Eclipse Paho Android Service'
+                description = 'The Paho project provides scalable open-source implementations of open and standard messaging protocols aimed at new, existing, and emerging applications for Machine to Machine (M2M) and Internet of Things (IoT).'
+                url = 'http://www.eclipse.org/paho'
+
+                licenses {
+                    license {
+                        name = 'Eclipse Public License - Version 1.0'
+                        url = 'http://www.eclipse.org/org/documents/epl-v10.php'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git://github.com:rosebud-iot/paho.mqtt.android.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:rosebud-iot/paho.mqtt.android.git'
+                    url = 'https://github.com/rosebud-iot/paho.mqtt.android.git'
+                }
+            }
+
+            // include dependencies
+            pom.withXml {
+                def dependencies = asNode().appendNode('dependencies')
+                configurations.getByName("releaseCompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+                    def dependency = dependencies.appendNode('dependency')
+                    dependency.appendNode('groupId', it.moduleGroup)
+                    dependency.appendNode('artifactId', it.moduleName)
+                    dependency.appendNode('version', it.moduleVersion)
+                }
+            }
         }
     }
     repositories {
-        /*
-        if (project.hasProperty('eclipseRepoUsername')) {
-            maven {
-                name 'eclipse'
-                url 'https://repo.eclipse.org/content/repositories/paho-' + (rootProject.ext.serviceVersion.endsWith('-SNAPSHOT') ? 'snapshots/' : 'releases/')
-                credentials {
-                    username eclipseRepoUsername
-                    password eclipseRepoPassword
-                }
-            }
-        } else {
-            maven {
-                url "$buildDir/repo"
+        maven {
+            name = "GitHubPublicPackages"
+            url = uri("https://maven.pkg.github.com/sweepr-sdk/android")
+            credentials {
+                username = sweeprProperties["github.username"]
+                password = sweeprProperties["github.token"]
             }
         }
-         */
     }
 }
-
-/*
-// Required to bundle Java library Jar in AAR
-clean.doLast{
-    copyLibs.execute()
-}
-assemble.doLast {
-    renameReleaseAAR.execute()
-}
-
-clean.doFirst {
-    delete 'libs'
-}
- */
