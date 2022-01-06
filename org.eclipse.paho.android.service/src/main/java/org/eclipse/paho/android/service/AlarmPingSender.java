@@ -66,6 +66,14 @@ class AlarmPingSender implements MqttPingSender {
 		this.alarmReceiver = new AlarmReceiver();
 	}
 
+	private static int getPendingIntentFlags() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			return PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT;
+		} else {
+			return PendingIntent.FLAG_UPDATE_CURRENT;
+		}
+	}
+
 	@Override
 	public void start() {
 		String action = MqttServiceConstants.PING_SENDER
@@ -74,7 +82,7 @@ class AlarmPingSender implements MqttPingSender {
 		service.registerReceiver(alarmReceiver, new IntentFilter(action));
 
 		pendingIntent = PendingIntent.getBroadcast(service, 0, new Intent(
-				action), PendingIntent.FLAG_UPDATE_CURRENT);
+				action), getPendingIntentFlags());
 
 		schedule(comms.getKeepAlive());
 		hasStarted = true;
