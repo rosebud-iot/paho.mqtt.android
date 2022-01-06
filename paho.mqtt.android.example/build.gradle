@@ -22,13 +22,6 @@ android {
     }
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven { url rootProject.ext.mavenUrl }
-}
-
-
 dependencies {
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
@@ -36,7 +29,6 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.2.1"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${rootProject.ext.clientVersion}"
     implementation project(':org.eclipse.paho.android.service')
+
     testImplementation 'junit:junit:4.13.2'
 }
-
-configurations.implementation.exclude module: 'org.eclipse.paho.client.mqttv3'

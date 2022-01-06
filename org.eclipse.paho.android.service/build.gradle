@@ -10,6 +10,7 @@ android {
         targetSdkVersion 30
 
         testApplicationId "org.eclipse.paho.android.service.test"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -23,17 +24,16 @@ android {
     }
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven { url rootProject.ext.mavenUrl }
-}
-
 dependencies {
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${rootProject.ext.clientVersion}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    androidTestImplementation 'androidx.test:core:1.3.0'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
+    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.ext:truth:1.4.0'
 }
 
 /*

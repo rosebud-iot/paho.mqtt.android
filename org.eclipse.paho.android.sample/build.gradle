@@ -22,11 +22,6 @@ android {
     }
 }
 
-repositories {
-    google()
-    maven { url rootProject.ext.mavenUrl }
-}
-
 dependencies {
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
@@ -38,5 +33,3 @@ task publishAPK(type: Copy) {
     from file("${project.buildDir}/outputs/apk/" + rootProject.ext.sampleArchivesBaseName + "-debug.apk");
     into '/shared/technology/paho/Android/' + rootProject.ext.sampleVersion + '/debug/';
 }
-
-configurations.implementation.exclude module: 'org.eclipse.paho.client.mqttv3'
