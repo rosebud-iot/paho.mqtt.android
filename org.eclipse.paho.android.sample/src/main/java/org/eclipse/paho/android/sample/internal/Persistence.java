@@ -353,7 +353,9 @@ public class Persistence extends SQLiteOpenHelper implements BaseColumns {
             opts.setKeepAliveInterval(keepAlive);
             opts.setConnectionTimeout(timeout);
 
-            opts.setPassword(password != null ? password.toCharArray() : null);
+            if (password != null) {
+                opts.setPassword(password.toCharArray());
+            }
             opts.setUserName(username);
 
             if (topic != null) {
@@ -361,7 +363,7 @@ public class Persistence extends SQLiteOpenHelper implements BaseColumns {
             }
 
             //now create the connection object
-            connection = Connection.createConnection(clientHandle, clientID, host, port, context, ssl);
+            connection = Connection.createConnection(clientHandle, clientID, host, port, context, true);
             connection.addConnectionOptions(opts);
             connection.assignPersistenceId(id);
 
